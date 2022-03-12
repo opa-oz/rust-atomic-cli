@@ -2,11 +2,14 @@ extern crate core;
 
 use json_generator::{create_ints_array, create_objects_array, create_strings_array};
 use clap::{arg, ArgMatches, command, Command, ArgEnum, PossibleValue};
+use json_pick::{pick_field, pick_fields};
 
 #[derive(strum::Display)]
 enum Subcommand {
     #[strum(serialize = "generate")]
-    Generate
+    Generate,
+    #[strum(serialize = "pick")]
+    Pick,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ArgEnum)]
@@ -93,11 +96,56 @@ fn main() {
                         .required(false)
                 ),
         )
+        .subcommand(
+            Command::new(Subcommand::Pick.to_string())
+                .arg(
+                    arg!(-i --input <INPUT_PATH>)
+                        .required(true)
+                        .help("File to pick from")
+                )
+                .arg(
+                    arg!(-o --output <OUTPUT_PATH>)
+                        .required(true)
+                        .help("File to save")
+                )
+                .arg(
+                    arg!(-f --fields <FIELDS>)
+                        .required(true)
+                        .help("List of fields, comma-separated. Single value if --flat=true")
+                )
+                .arg(
+                    arg!(-F --flat)
+                        .required(false)
+                ),
+        )
         .get_matches();
 
     match matches.subcommand() {
-        Some((_, sub_matches)) => generate_subcommand(sub_matches),
+        Some(("generate", sub_matches)) => generate_subcommand(sub_matches),
+        Some(("pick", sub_matches)) => pick_subcommand(sub_matches),
         _ => unreachable!("Exhausted list of subcommands and subcommand_required prevents `None`"),
+    }
+}
+
+fn pick_subcommand(sub_matches: &ArgMatches) {
+    let is_flat: bool = sub_matches.is_present("flat");
+    let output_path: &str = match sub_matches.value_of("output") {
+        Some(f) => f,
+        _ => unreachable!("Please, specify output file")
+    };
+    let input_path: &str = match sub_matches.value_of("input") {
+        Some(f) => f,
+        _ => unreachable!("Please, specify input file")
+    };
+    let fields: &str = match sub_matches.value_of("fields") {
+        Some(f) => f,
+        _ => unreachable!("Please, specify fields")
+    };
+
+    if is_flat {
+        pick_field(fields, output_path, input_path);
+    } else {
+        pick_fields(fields, output_path, input_path);
     }
 }
 

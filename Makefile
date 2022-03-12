@@ -43,3 +43,11 @@ strings: build clear ## Generate "strings" array to file
 
 objects: build clear ## Generate "strings" array to file
 	"$(bin_path)" generate -p objects --file "$(runtime_path)/objects.json" --length 10
+
+# ========== Pick ========== #
+
+pick: objects ## Pick fields from objects
+	"$(bin_path)" pick --input "$(runtime_path)/objects.json" --output "$(runtime_path)/picked.json" --fields "id, exists, obj"
+
+pick_flat: objects ## Pick single field fro, objects
+	"$(bin_path)" pick -F --input "$(runtime_path)/objects.json" --output "$(runtime_path)/picked.json" --fields "after"

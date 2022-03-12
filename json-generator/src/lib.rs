@@ -17,7 +17,10 @@ const OBJECTS_ARRAY: &str = r#"
     "|after": "str(10)",
     "|date": "dt()",
     "|score": "int()",
-    "|exists": "bool()"
+    "|exists": "bool()",
+    "obj": {
+        "|uid": "seq()"
+    }
 }
 "#;
 
