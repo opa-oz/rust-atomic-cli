@@ -1,0 +1,7 @@
+[workspace]
+
+members = [
+    "atomic-cli",
+    "json-generator",
+    "json-pick",
+]
